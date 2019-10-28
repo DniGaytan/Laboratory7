@@ -7,7 +7,7 @@ $(document).ready(function(){
     contentType : "application/json",
     success : function(response){
       console.log(response);
-      updateBlogs(response);
+      restartBlogs(response);
       for(var i = 0 ; i < response.length; i++){
         var newDiv = document.createElement("div");
         var titleH4 = document.createElement("h4");
@@ -18,6 +18,7 @@ $(document).ready(function(){
         $(authorP).text(response[i].author);
         $(newDiv).append(titleH4, contentP, authorP);
         $(newDiv).addClass("blog-entry justify-content-center");
+        $(newDiv).attr('id', response[i].id);
         $("#blogs-wrap").append(newDiv);
       }
     },
@@ -47,19 +48,8 @@ $("#button-post").on("click", function(event){
       datatype : 'JSON',
       contentType : "application/json",
       success : function(response){
-        var blogs = [];
-        blogs.push(response);
-        updateBlogs(blogs);
-        var newDiv = document.createElement("div");
-        var titleH4 = document.createElement("h4");
-        var contentP = document.createElement("p");
-        var authorP = document.createElement("p");
-        $(titleH4).text(response.title);
-        $(contentP).text(response.content);
-        $(authorP).text(response.author);
-        $(newDiv).append(titleH4, contentP, authorP);
-        $(newDiv).addClass("blog-entry justify-content-center");
-        $("#blogs-wrap").append(newDiv);
+        updateBlogs(response);
+        updateMain(blogs);
       },
       error : function(errorResponse){
         console.log(errorResponse.json.statusMessage);
@@ -81,8 +71,8 @@ $("#button-delete").on("click", function(event){
         method : 'DELETE',
         contentType : "application/json",
         success : function(response){
-          updateBlogs(response);
-          updateMain(response);
+          restartBlogs(response);
+          restartMain(response);
         },
         error : function(errorResponse){
           console.log(errorResponse.json.statusMessage);
@@ -94,7 +84,54 @@ $("#button-delete").on("click", function(event){
   }
 });
 
-function updateBlogs(blogs){
+$("#button-update").on("click", function(event){
+    var options = $("#update-select").children();
+
+    for(var i = 0 ; i < options.length; i++){
+      if(options[i].selected){
+        var sendingPost = {
+          id : options[i].className,
+          title : $("#update-title").val(),
+          content : $("#update-content").val(),
+          author : $("#update-author").val(),
+        }
+        console.log(options[i].className);
+        settings = {
+          url : url + "/" +options[i].className,
+          method : 'PUT',
+          data : JSON.stringify(sendingPost),
+          dataType : 'JSON',
+          contentType : "application/json",
+          success : function(response){
+            changePost(response);
+          },
+          error : function(errorResponse){
+            console.log(errorResponse);
+          }
+        }
+
+        $.ajax(settings);
+      }
+    }
+});
+
+function updateBlogs(blog){
+  console.log(blog.title);
+    var opt = document.createElement("option");
+    $(opt).text(blog.title);
+    $(opt).addClass(blog.id);
+    $("#delete-select").append(opt);
+
+    var opt = document.createElement("option");
+    $(opt).text(blog.title);
+    $(opt).addClass(blog.id);
+    $("#update-select").append(opt);
+
+};
+
+function restartBlogs(blogs){
+  $("#delete-select").empty();
+  $("#update-select").empty();
   console.log(blogs[0].title);
   for(var i = 0; i < blogs.length; i++){
     var opt = document.createElement("option");
@@ -113,7 +150,7 @@ function updateBlogs(blogs){
 
 };
 
-function updateMain(blogs){
+function restartMain(blogs){
   $("#blogs-wrap").empty();
 
   for(var i = 0 ; i < blogs.length; i++){
@@ -126,6 +163,47 @@ function updateMain(blogs){
     $(authorP).text(blogs[i].author);
     $(newDiv).append(titleH4, contentP, authorP);
     $(newDiv).addClass("blog-entry justify-content-center");
+    $(newDiv).attr('id', blogs[i].id);
     $("#blogs-wrap").append(newDiv);
   }
+}
+
+function updateMain(blog){
+
+    var newDiv = document.createElement("div");
+    var titleH4 = document.createElement("h4");
+    var contentP = document.createElement("p");
+    var authorP = document.createElement("p");
+    $(titleH4).text(blog.title);
+    $(contentP).text(blog.content);
+    $(authorP).text(blog.author);
+    $(newDiv).append(titleH4, contentP, authorP);
+    $(newDiv).addClass("blog-entry justify-content-center");
+    $(newDiv).attr('id', blog.id);
+    $("#blogs-wrap").append(newDiv);
+
+}
+
+function changePost(post){
+  var options = $("#update-select").children();
+  for(var i = 0; i < options.length; i++){
+    if(options[i].className == post.id){
+      options[i].text(post.title);
+    }
+  }
+
+  var options = $("#delete-select").children();
+  for(var i = 0; i < options.length; i++){
+    if(options[i].className == post.id){
+      options[i].text(post.title);
+    }
+  }
+
+  var divs = $("#blogs-wrap").children();
+  for(var i = 0; i < divs.length; i++){
+    if(divs[i].id == post.id){
+      divs[i].text(post.title);
+    }
+  }
+
 }

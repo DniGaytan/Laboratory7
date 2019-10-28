@@ -103,19 +103,24 @@ app.delete('/blog-posts/:id', function(req, res){
   return res.status(200);
 });
 
-app.put('/blog-posts/:id', function(req, res){
+app.put('/blog-posts/:id', jsonP, function(req, res){
   if(req.body.id != ''){
     if (req.params.id == req.body.id) {
-      let newEntry = {
-        id : uuid.v4(),
-        title : req.body.title,
-        content : req.body.content,
-        author: req.body.author,
-        publishDate: req.body.publishDate,
+      for(var i = 0; i < existingPosts.length; i++){
+        if(existingPosts[i].id == req.params.id){
+          if(req.body.title != ""){
+            existingPosts[i].title = req.body.title;
+          }
+          if(req.body.content != ""){
+            existingPosts[i].content = req.body.content;
+          }
+          if(req.body.author != ""){
+            existingPosts[i].author = req.body.author;
+          }
+          return res.status(202).json(existingPosts[i]);
+        }
       }
 
-      existingPosts.push(newEntry);
-      return res.status(202).json(newEntry);
     }
     else{
       res.statusMessage('Id does not match');
