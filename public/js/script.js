@@ -23,7 +23,7 @@ $(document).ready(function(){
       }
     },
     error : function(errorResponse){
-      console.log(errorResponse.json.statusMessage);
+      alert(errorResponse.json.statusMessage);
     }
   };
 
@@ -49,10 +49,10 @@ $("#button-post").on("click", function(event){
       contentType : "application/json",
       success : function(response){
         updateBlogs(response);
-        updateMain(blogs);
+        updateMain(response);
       },
       error : function(errorResponse){
-        console.log(errorResponse.json.statusMessage);
+        alert(errorResponse.json.statusMessage);
       }
     }
 
@@ -60,6 +60,7 @@ $("#button-post").on("click", function(event){
 });
 
 $("#button-delete").on("click", function(event){
+
   var options = $("#delete-select").children();
   console.log(options);
 
@@ -73,9 +74,10 @@ $("#button-delete").on("click", function(event){
         success : function(response){
           restartBlogs(response);
           restartMain(response);
+
         },
         error : function(errorResponse){
-          console.log(errorResponse.json.statusMessage);
+          alert(errorResponse.json.statusMessage);
         }
       }
 
@@ -106,7 +108,7 @@ $("#button-update").on("click", function(event){
             changePost(response);
           },
           error : function(errorResponse){
-            console.log(errorResponse);
+            alert(errorResponse);
           }
         }
 

@@ -73,7 +73,7 @@ app.post('/blog-posts', jsonP, function(req, res, next){
       title : req.body.title,
       content: req.body.content,
       author: req.body.author,
-      publishDate: "asd"
+      publishDate: Date.now(),
     }
 
     existingPosts.push(newPost);
